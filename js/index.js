@@ -1,7 +1,16 @@
 window.onload = () => {
   document.getElementById('start-button').onclick = () => {
-    startGame();
+    const game = new Game ();
   };
 
-  function startGame() {}
+  // function startGame() {
+
+    
+    
+    
+  //   // carImage.onload = function() {
+  //   // context.drawImage(carImage, 220, 400,50,100);
+  //   // };
+  // }
 };
+
