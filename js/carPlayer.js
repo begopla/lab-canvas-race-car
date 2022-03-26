@@ -24,6 +24,8 @@ class CarPlayer{
                 this.playerSize.h
                 );
             }
+
+           
     }
 
     moveLeft(){

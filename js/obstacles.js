@@ -1,28 +1,29 @@
 class Obstacles {
-    constructor (canvas,ctx,positionX,positionY,width,height,gameSize){
-       this.canvas = canvas;
+    constructor (ctx, width, height, color, x, y){
         this.ctx = ctx;
-        this.obstaclePos = {x:positionX, y: positionY};
-        this.playerSize = {w: width, h: height};
-        
-        this.gameSize = gameSize;
-        this.frames = 0;
+        this.width = width;
+        this.height = height;
+        this.color = color;
+        this.x = x;
+        this.y = y;
+        // new speed properties
+      this.speedX = 0;
+      this.speedY = 0;
+      
     }
 
-    addBarrier(){///add a counter to count how many times we call the function
-        this.frames +=1; 
-        if(this.frames %60 ===0){
-            let minWidth=20;
-            let maxWidth = 200;
-            let width =  Math.floor(Math.random()*(maxWidth-minWidth+1)+minWidth)
-            let minGap = 50;
-            let maxGap = 200;
-            let gap = Math.floor(Math.random() * (maxGap - minGap + 1) + minGap);
-            myObstacles.push(new Component(width, 10, 'red', 0, y));
-            myObstacles.push(new Component(this.gameSize.w-width-gap, 10, 'red', 0, width + gap));
+    update(){
+        this.ctx.fillStyle = this.color;
+        this.ctx.fillRect(this.x, this.y, this.width, this.height); 
+    //     this.ctx.rect(250, 200, 50, 50);
+    //     this.ctx.fill();
+    //     this.ctx.strokeStyle = "black";
+    //     this.ctx.stroke();
+     }
 
-        }
-
-
+    newPos() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+      }
     }
-}
+
