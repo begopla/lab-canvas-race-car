@@ -1,9 +1,9 @@
-window.onload = () => {
+ //window.onload = () => {//since the index.js is loaded the last, this is not needed
   document.getElementById('start-button').onclick = () => {
     const game = new Game ();
   };
 
-  function startGame() {
+ // function startGame() {
 
     
     
@@ -11,6 +11,6 @@ window.onload = () => {
     // carImage.onload = function() {
     // context.drawImage(carImage, 220, 400,50,100);
     // };
-  }
-};
+ // }
+
 

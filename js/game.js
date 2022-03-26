@@ -1,4 +1,10 @@
-const myObstacles = [];
+let myObstacles = [];
+const gameIntroElement = document.querySelector(".game-intro");
+const gameOverElement = document.querySelector(".game-over");
+const restartButton = gameOverElement
+	.querySelector("button")
+	.addEventListener("click", () => {new Game()});
+//const restartButton = gameOverElement.querySelector("button").addEventListener("click", new Game())
 class Game {
 constructor(){
     this.canvas = null;
@@ -8,20 +14,23 @@ constructor(){
     this.background = null;
     this.frames = 0;
     this.obstacles = null;
-    this.obstacles2 = null;
     this.player = null;
+    this.moveSpeed =3;
+    this.score = 0;
+    this.intervalId = 0;
 
     this.init();
 }
 
 init(){//* triggers the functions bellow in order
     console.log('GAME ON!')
+    gameIntroElement.classList.add("hidden")
+    gameOverElement.classList.add("hidden")
+    this.reset();
     this.setCanvas();
     this.getSize();
     this.loadBackground()
     this.createPlayer();
-    //this.createSquare();
-    this.createObstacles();
     this.drawAll();
     this.setEventHandlers();
 }
@@ -43,88 +52,106 @@ getSize(){//* get size of the canvas
 
 loadBackground(){
 
-    this.background =new Background(this.canvas,this.ctx);
+    this.background =new Background(this.canvas,this.ctx, this.moveSpeed);
     this.background.setImage();
     
-     
     // this.roadImage.onload = function() {
     
-    // this.ctx.drawImage(this.roadImage, 0, 0,350,450*(640/480));
-    //     };
-    
+    // this.ctx.drawImage(this.roadImage, 0, 0,350,450*(640/480));  
 }
 
 createPlayer(){ //*cretes a player, feeding it with the context (.ctx) and some values
 
-    this.carPlayer = new CarPlayer (this.ctx, 220, 400,50,100,this.gameSize)
+    this.carPlayer = new CarPlayer (this.ctx, 220, 400,50,100,this.gameSize,this.moveSpeed)
     
 }
 
-// createSquare(){
-//     this.player = new  Obstacles(this.ctx,30, 30, 'red', 0, 110);
-   
-// }
 
-createObstacles(){
-    
-    this.frames +=1; //add a counter to count how many times we call the function
-   
-        let y = this.gameSize.w;
-        let x = this.gameSize.h;
-        let minWidth = 20;
-        let maxWidth = 200;
-        let width = Math.floor(Math.random() * (maxWidth - minWidth + 1) + minWidth);
-        let minGap = 50;
-        let maxGap = 200;
-        let gap = Math.floor(Math.random() * (maxGap - minGap + 1) + minGap);
-        this.obstacles = new Obstacles(this.ctx,width, 10, 'red', 0.08*this.gameSize.w, 0.1*y);
-        
-        myObstacles.push(this.obstacles);
-        this.obstacles2 = new Obstacles (this.ctx,(y - width -gap), 10, 'red',  width + gap, 0.1*y)
-      
-        myObstacles.push(this.obstacles2);
-        console.log(myObstacles)
-    
-    
-}
 
 drawAll(){//* it creates and interval in which 60 times a seconds clears the canvas and draws the next position of the player
     // setInterval(()=>{ 
-    //     //this.clear()
-    //     this.clear();
-    //     this.carPlayer.draw();
-    //    // this.carPlayer.moveRight(); //! we should move only when pressing a key, using the DOM   
     // },1000 / 60 )
+    this.clear();
+    this.frames ++; //add a counter to count how many times we call the function
+
+    if(this.frames %10 ===0) {
+        this.score +=3;
+    }
+
+    
+    if(this.frames === 60){
+        this.obstacles = new Obstacles(this.ctx,this.canvas);    
+        myObstacles.push(this.obstacles)
+        this.frames =0
+    }
     //? we want to use only the refreshing rate of the user screen to lower computational power so instead we request the animation frame of the user:
-        this.clear();
-        this.background.draw();
-        this.background.move();
-        this.carPlayer.draw();
-        //this.player.update();
-        for (let i = 0; i < myObstacles.length; i++) {
-        myObstacles[i].y += +0.5;
-        this.obstacles.update();
-      }
+    this.background.draw();
+    this.background.move();
+    this.carPlayer.draw();
+   
+    for (let i = 0; i < myObstacles.length; i++) {
+    this.obstacles.newPos()
+    this.obstacles.update();
+  }     
+    this.drawScore()
         
         
-        
+     if(this.collisionBetweenCarAndObstacle()){
+            console.log("toucheed!!")
+            gameOverElement.classList.remove("hidden");
+            this.reset();
+            return;
+     }
 
-
-        requestAnimationFrame(()=>this.drawAll())
+       this.intervalId = requestAnimationFrame(()=>this.drawAll())
+        
 }
 
 setEventHandlers(){ //* setting the event handlers on the coument calling the determinate moving function for the assigned keys 
     document.addEventListener('keydown',(event)=>{ //this is trigering an event ehnever a key is pressed
-        //console.log(event);
+       // console.log(event);
        const key = event.key;
        key === "ArrowRight" ? this.carPlayer.moveRight(): null;
        key === "ArrowLeft" ? this.carPlayer.moveLeft(): null;
-       key === "ArrowRight" ? this.carPlayer.moveRight(): null;
-       key === "ArrowLeft" ? this.carPlayer.moveLeft(): null;
+       key === "ArrowUp" ? this.carPlayer.moveTop(): null;
+       key === "ArrowDown" ? this.carPlayer.moveBottom(): null;
     })
     }
 
 clear(){
     this.ctx.clearRect(0, 0, this.gameSize.w, this.gameSize.h)
+}
+
+collisionBetweenCarAndObstacle(){ //if the car is inside the Y & X axis of the obstacle then we crashed
+   let hasCollided = false
+    for(let i=0; i<myObstacles.length; i++){
+        //const anyObst = myObstacles[i]
+        const withinX = this.carPlayer.playerPos.x +this.carPlayer.playerSize.w > this.obstacles.x && this.carPlayer.playerPos.x < this.obstacles.x+this.obstacles.width
+        const withinY = this.obstacles.y + this.obstacles.height > this.carPlayer.playerPos.y && this.obstacles.y < this.carPlayer.playerPos.y + this.carPlayer.playerSize.h
+        
+        hasCollided = withinX && withinY
+
+        if(hasCollided){
+            break;
+
+        }
+    }
+    return hasCollided;
+}
+drawScore() {
+	this.ctx.fillStyle = "black";
+	this.ctx.font = "32px sans-serif";
+	this.ctx.fillText(`Score: ${this.score}`, 20, 50);
+}
+
+
+reset(){
+    //clearTheInterval(intervalId); -- > for SetInterval()
+    cancelAnimationFrame(this.intervalId);
+    this.background = null;
+    this.carPlayer= null;
+    myObstacles = [];
+    this.score = 0;
+    this.frames = 0;
 }
 }

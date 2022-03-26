@@ -1,9 +1,9 @@
 class Background {
-	constructor(canvas, ctx) {
+	constructor(canvas, ctx, moveSpeed) {
 		this.canvas = canvas;
 		this.ctx = ctx;
 		this.image = null;
-		this.moveSpeed = 2;
+		this.moveSpeed = moveSpeed;
 		this.y = 0;
 	}
 
@@ -34,5 +34,10 @@ class Background {
 	move() {
 		this.y += this.moveSpeed; //**moving down adding the defined speed */
 		this.y %= this.canvas.height; //*this is returning and assigning to y a value between 0 and the canvas height
-	}
+        //*?Same coding:
+        // if(this.y > this.canvas.height){
+        //     this.y =0;
+        // }
+    
+    }
 }

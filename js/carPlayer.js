@@ -1,10 +1,11 @@
 class CarPlayer{
-    constructor(ctx,positionX,positionY,width,height,gameSize){
+    constructor(ctx,positionX,positionY,width,height,gameSize,moveSpeed){
         this.ctx = ctx;
         this.playerPos = {x:positionX, y: positionY};
         this.playerSize = {w: width, h: height};
         this.playerImage = null;
         this.gameSize = gameSize;
+        this.moveSpeed = moveSpeed
         this.init()
     }
 
@@ -31,13 +32,23 @@ class CarPlayer{
     moveLeft(){
        if(this.playerPos.x>this.gameSize.w*0.1){
 
-        this.playerPos.x -=5;
+        this.playerPos.x -=this.moveSpeed;
        }
       }
     
     moveRight(){
         if(this.playerPos.x <this.gameSize.w*0.8)
-        this.playerPos.x +=5;
+        this.playerPos.x +=this.moveSpeed;
     }
+
+    moveTop(){
+        if(this.playerPos.y>0)
+        this.playerPos.y -=this.moveSpeed;
+    }
+    moveBottom(){
+        if(this.playerPos.y <this.gameSize.h-this.playerSize.h)
+        this.playerPos.y +=this.moveSpeed;
+    }
+   
    
 }
